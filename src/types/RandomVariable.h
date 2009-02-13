@@ -95,6 +95,6 @@ public:
 };
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*RANDOMVARIABLE_H_*/

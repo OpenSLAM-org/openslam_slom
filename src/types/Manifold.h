@@ -22,6 +22,6 @@ struct Manifold
 	
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*MANIFOLD_H_*/

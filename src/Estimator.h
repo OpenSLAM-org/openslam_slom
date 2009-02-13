@@ -7,9 +7,7 @@
 
 #include "types/IdxVector.h"
 
-extern "C" {
 #include <cs.h>
-}
 
 namespace SLOM {
 
@@ -165,6 +163,6 @@ public:
 	
 };
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*ESTIMATOR_H_*/

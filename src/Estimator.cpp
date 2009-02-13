@@ -320,4 +320,4 @@ double Estimator::optimizeStep(){
 	return gain;
 }
 
-}  // namespace SLSQ
+}  // namespace SLOM

@@ -34,7 +34,7 @@ struct Vect : public Manifold<Vect<D>,D>{
 };
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 
 #endif /*VECT_H_*/

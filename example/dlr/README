@@ -1,0 +1,25 @@
+
+Usage:
+Just build the program using make in the trunk directory, then cd to this 
+directory and run:
+> ./dlr_data_set map.circles
+
+It then reads the odometry and landmark measurements and obtains the least 
+square solution for the corresponding SLAM problem.
+It outputs all intermediate results in separate files which can be plotted 
+using e.g. gnuplot.
+
+Optionally you can provide estimations for the landmarks as a second file.
+It then holds the provided landmarks fixed and optimizes only the poses 
+(and landmarks which were not provided).
+
+Format of logfile is described within map.circles.
+
+The optional landmark file has to have only landmarks one per line like:
+X Y id
+separated by spaces or tabulators. Order is not important.
+
+
+Logfile is by courtesy of Udo Frese and was obtained from here:
+http://www.informatik.uni-bremen.de/agebv/en/DlrSpatialCognitionDataSet
+

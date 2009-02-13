@@ -143,7 +143,7 @@ private:
 
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*SON_H_*/
 

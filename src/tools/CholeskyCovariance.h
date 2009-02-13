@@ -132,6 +132,6 @@ struct CholeskyCovariance
 	}
 };	
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*CHOLESKYCOVARIANCE_H_*/

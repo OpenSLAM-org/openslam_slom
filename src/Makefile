@@ -7,5 +7,5 @@ HEADER = Estimator.h types/*.h tools/*.h manifolds/*.h
 all: Estimator.o
 
 
-Estimator.o: $(HEADER)
+Estimator.o: $(HEADER) ../Makefile.conf
 

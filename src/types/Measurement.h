@@ -48,7 +48,7 @@ private:
 
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 
 

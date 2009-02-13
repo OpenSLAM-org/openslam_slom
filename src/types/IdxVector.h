@@ -41,6 +41,6 @@ public:
 };
 
 
-}  // namespace SLSQ
+}  // namespace SLOM
 
 #endif /*IDXVECTOR_H_*/

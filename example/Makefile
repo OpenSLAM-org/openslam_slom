@@ -1,1 +1,2 @@
 all:
+	make -C dlr
