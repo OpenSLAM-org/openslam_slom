@@ -1,7 +1,4 @@
 #include "Estimator.h"
-extern "C" {
-#include <cs.h>
-}
 
 #include <algorithm>
 #include <cmath>
@@ -21,7 +18,7 @@ void Estimator::freeWorkspace(){
 	JtJ = cs_spfree(JtJ);
 	symbolic=cs_sfree(symbolic);
 	numeric=cs_nfree(numeric);
-	
+
 	delete[] res;            res = 0;
 	delete[] workspace;      workspace = 0;
 	delete[] cholCovariance; cholCovariance = 0;
@@ -65,7 +62,7 @@ void Estimator::createSparse(){
 		skip = 1;
 	}
 	//allocate a compressed column matrix:
-	jacobian = cs_spalloc(M, N,   // size 
+	jacobian = cs_spalloc(M, N,   // size
 	                    size,    // number of non-zeros
 	                    true,   // allocate space for values
 	                    false); // compressed-column
@@ -82,7 +79,7 @@ void Estimator::createSparse(){
 		if(var->begin()==var->end()){
 			std::cerr << v - variables.begin() << std::endl;
 			assert(var->begin() != var->end()); // No measurements
-			
+
 		}
 		for(IRVWrapper::const_iterator meas= var->begin(); meas!= var->end(); meas++){
 			int row = (*meas)->idx;
@@ -93,7 +90,7 @@ void Estimator::createSparse(){
 		if(usedAlgorithm != GaussNewton){
 			*rIdx++ = n++;
 		}
-		*++cIdx = rIdx - jacobian->i; //start of next column 
+		*++cIdx = rIdx - jacobian->i; //start of next column
 		while(--vDOF > 0){ // copy the current column for each DOF of the variable
 			rIdx = std::copy(jacobian->i + cIdx[-1], // start of previous column
 					rIdx-skip, rIdx);
@@ -105,7 +102,7 @@ void Estimator::createSparse(){
 	}
 	//*cIdx = rIdx - matrix->i; //end of last column;
 	assert(*cIdx == size);
-	
+
 	switch(usedSolver){
 	case QR:
 		symbolic = cs_sqr(3, jacobian, true);
@@ -131,9 +128,9 @@ void Estimator::calculateJacobian(){
 	assert(jacobian);   // matrix is allocated
 	assert(res);
 	assert(cholCovariance);
-	int m = jacobian->m, n = jacobian->n; 
+	int m = jacobian->m, n = jacobian->n;
 	double *x = jacobian->x;
-	
+
 	int skip=0;
 	switch(usedAlgorithm){
 	case GaussNewton:
@@ -151,7 +148,7 @@ void Estimator::calculateJacobian(){
 	}
 
 	double *chol = cholCovariance;
-	
+
 	for(IdxVector<IRVWrapper>::iterator v = variables.begin(); v!= variables.end(); v++){
 		IRVWrapper* var = *v;
 		int vDOF = var->getDOF();
@@ -169,7 +166,7 @@ void Estimator::calculateJacobian(){
 				temp=(*meas)->eval(temp);
 			}
 			var->restore();
-			
+
 			// store $f(\mu \mplus -1/d)$ directly in the matrix:
 			var->add(add, -1);
 			temp = x;
@@ -177,7 +174,7 @@ void Estimator::calculateJacobian(){
 				temp=(*meas)->eval(temp);
 			}
 			var->restore();
-			
+
 			// calculate difference and multiply by $0.5d$
 			// also accumulate results for new inverse covariance
 			double c = 0;
@@ -190,11 +187,11 @@ void Estimator::calculateJacobian(){
 			add[k] = 0; // reset delta-vector
 			x += skip; // skip one entry for Levenberg(-Marquardt)
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 }
 
 void Estimator::updateDiagonal() {
@@ -203,12 +200,12 @@ void Estimator::updateDiagonal() {
 	int n=jacobian->n;
 	int *p = jacobian->p;
 	double *x = jacobian->x;
-	
+
 	for(int k=0; k<n; k++){
-		x[p[k+1]-1] = (usedAlgorithm == Levenberg ? 
+		x[p[k+1]-1] = (usedAlgorithm == Levenberg ?
 				lamda : lamda*cholCovariance[k]);
 	}
-	
+
 }
 
 void Estimator::updateSparse(){
@@ -222,17 +219,17 @@ void Estimator::qrSolve(double* delta){
 	numeric = cs_qr(jacobian, symbolic);
 	assert(numeric);
 	int m=jacobian->m, n=jacobian->n;
-	
+
 	// The following code essentially does a cs_qrsol(3, matrix, workspace);
-	// but it doesn't recalculate the symbolic decomposition 
-	
+	// but it doesn't recalculate the symbolic decomposition
+
 	cs_ipvec(symbolic->pinv, res, workspace, m) ; /* x(0:m-1) = b(p(0:m-1) */
 	for (int k = 0; k < n; k++) /* apply Householder refl. to x */
 	{
 		cs_happly(numeric->L, k, numeric->B [k], workspace) ;
 	}
 	cs_usolve(numeric->U, workspace) ; /* x = R\x */
-	
+
 	cs_ipvec(symbolic->q, workspace, delta, n) ; /* b(q(0:n-1)) = x(0:n-1) */
 	// end of qrsol
 }
@@ -264,12 +261,12 @@ void Estimator::initialize(){
 double Estimator::optimizeStep(){
 	// TODO better parameter control for LMA
 	assert(jacobian);
-	
+
 	int m=jacobian->m, n=jacobian->n;
-	
+
 	updateSparse();
-	
-	
+
+
 	//std::fill(workspace, workspace+m, 0);
 	double sum=evaluate(res);
 	std::cout << sum;
@@ -287,7 +284,7 @@ double Estimator::optimizeStep(){
 		choleskySolve(delta);
 		break;
 	}
-	
+
 	const double *temp=delta;
 	for(IdxVector<IRVWrapper>::iterator v = variables.begin(); v!= variables.end(); v++){
 		IRVWrapper* var = *v;

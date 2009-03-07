@@ -9,113 +9,71 @@
 #include <string>
 #include <sstream>
 #include <iterator>
-#include <exception>
-#include <map>
-#include <functional>
 
-class DLR_Data_Parser
-{
+class DLR_Data_Parser {
 public:
-	DLR_Data_Parser(const char* filename): fname(filename)
-	{
-		open(); 
+	typedef std::vector<double> dvector;
+
+	DLR_Data_Parser(const char* filename, std::ostream &out = std::cout): fname(filename), out(out) {
+		open();
 	}
-	
-	void open()
-	{
+
+	void open() {
 		f.open(fname.c_str());
-		cout << "opening " <<  fname << "...";
-		if ( f.good() )
-		{
-			cout << "okay" << endl;
-			cout << "Position: " << f.tellg() << endl;
-		}
-		else
-		{
-			cout << "failed" << endl;
+		out << "opening " <<  fname << "...";
+		if ( f.good() ) {
+			out << "okay\n";
+			out << "Position: " << f.tellg() << std::endl;
+		} else {
+			out << "failed" << std::endl;
 		}
 	}
-	
-	int n_step()
-	{
-		size_t pos = f.tellg();
-		f.seekg(ios_base::beg);
-		string line;
-		int count = 0;
-		while ( getline(f, line) )
-		{
-			if ( string( &line[0], &line[4])  == string("STEP")) ++count;
-		}
-		f.seekg(pos);
-		return count;
-	}
-	
-	int n_lm()
-	{
-		size_t pos = f.tellg();
-		f.seekg(ios_base::beg);
-		string line;
-		int count = 0;
-		while ( getline(f, line) )
-		{
-			if ( string( &line[0], &line[4])  == string("LAND")) ++count;
-		}
-		f.seekg(pos);
-		return count;
-	}
-	
+
+	int n_step() { return count("STEP"); }
+
+    int n_lm() { return count("LAND"); }
+
 	int max_lm_id()
 	{
 		size_t pos = f.tellg();
-		f.seekg(ios_base::beg);
-		string line;
+		f.seekg(std::ios_base::beg);
+		std::string line;
 		int count = 0;
-		while (getline(f, line) )
-		{
-			if ( string( &line[0], &line[4])  == string("LAND"))
-			{
-				stringstream str(line);
-				string token;
+		while (getline(f, line) ) {
+			if ( line.compare(0, 4, "LAND") == 0) {
+				std::stringstream str(line);
+				std::string token;
 				double x,y, q, cov_x, cov_y, cov_xy;
 				str >> token >> x >> y >> q >> cov_x >> cov_y >> cov_xy;
-				while( str.good() )
-				{
+				while( str.good() ) {
 					int id;
 					str >> id;
-					count = max(count, id);
+					count = std::max(count, id);
 				}
 			}
 		}
 		f.seekg(pos);
 		return count;
 	}
-	
-	void reset()
-	{
+
+	void reset() {
 		f.close();
 		f.open(fname.c_str());
 	}
-	
-	bool eof()
-	{
+
+	bool eof() {
 		return f.eof();
 	}
-	
-	bool get_next_step(vector<double>& step)
-	{
+
+	bool get_next_step(dvector& step) {
 		step.clear();
-		//cout << "get_next_step()" << endl;
-		//cout << "position: " << f.tellg() << endl;
-		if ( f.tellg() == -1) return false; // uiuiui alle gehackt. mal aufräumen hier....
-		do
-		{
-			//cout << "Reading line: (Should be step) " << line << "\n" << endl;
-			if ( string(&line[0], &line[4]) == string("LAND") ) return false;
-			if ( string(&line[0], &line[4]) == string("STEP") )
-			{
-				stringstream str(line);
-				string token, file;
-				double dx,dy, dphi, cov_xx, cov_xy, cov_yy, cov_xphi, cov_yphi, cov_phiphi;
+		if ( f.tellg() == std::istream::pos_type(-1)) return false;
+		do {
+			if ( line.compare(0, 4, "LAND") == 0) return false;
+			if ( line.compare(0, 4, "STEP") == 0) {
+				std::stringstream str(line);
+				std::string token, file;
+				double dx, dy, dphi, cov_xx, cov_xy, cov_yy, cov_xphi, cov_yphi, cov_phiphi;
 				str >> token >> file >> dx >> dy >> dphi >> cov_xx >> cov_xy >> cov_yy >> cov_xphi >> cov_yphi >> cov_phiphi;
 				step.push_back(dx);
 				step.push_back(dy);
@@ -126,26 +84,21 @@ public:
 				step.push_back(cov_yy);
 				step.push_back(cov_yphi);
 				step.push_back(cov_phiphi);
-				//copy(step.begin(), step.end(), ostream_iterator<double>(cout, " "));
-				//cout << endl;
 				getline(f, line);
 				return true;
 			}
 		} while ( getline(f, line) );
 		return false;
 	}
-	
-	bool get_next_landmark(vector<double>& lm)
-	{
+
+	bool get_next_landmark(dvector& lm) {
 		lm.clear();
-		do
-		{
+		do {
 			if ( line[0] == '#' ) continue;
-			if ( string(&line[0], &line[4]) == string("STEP") ) return false;
-			if ( string(&line[0], &line[4]) == string("LAND") )
-			{
-				stringstream str(line);
-				string token;
+			if ( line.compare(0, 4, "STEP") == 0) return false;
+			if ( line.compare(0, 4, "LAND") == 0) {
+				std::stringstream str(line);
+				std::string token;
 				double x,y,q, cov_x, cov_y, cov_xy;
 				str >> token >> x >> y >> q >> cov_x >> cov_xy >> cov_y;
 				lm.push_back(x);
@@ -154,21 +107,9 @@ public:
 				lm.push_back(cov_x);
 				lm.push_back(cov_xy);
 				lm.push_back(cov_y);
-				str.exceptions( ios::failbit| ios::badbit );
-				try
-				{
-					for (;;)
-					{
-						int id;
-						str >> id;
-						lm.push_back(id);
-					}
-				}
-				catch ( std::exception& e)
-				{
-					cout << "no more ids" << endl;
-					getline(f, line);
-					return true;
+				int id;
+				while (str >> id, str.good() ) {
+					lm.push_back(id);
 				}
 				getline(f, line);
 				return true;
@@ -176,11 +117,28 @@ public:
 		} while ( getline(f, line) );
 		return false;
 	}
-	
+
 protected:
 	std::string fname;
 	std::ifstream f;
 	std::string line;
+	std::ostream &out;
+
+	int count(const char token[4])    {
+		size_t pos = f.tellg();
+		f.seekg(std::ios_base::beg);
+		std::string line;
+		int count = 0;
+		while(getline(f, line)){
+			if(line.compare(0, 4, token) == 0)
+				++count;
+		}
+		f.seekg(pos);
+		return count;
+	}
+
+
+
 };
 
 

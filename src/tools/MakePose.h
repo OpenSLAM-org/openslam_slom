@@ -4,6 +4,7 @@
 #include "AutoConstruct.h"
 #include "../manifolds/SOn.h"
 #include "../manifolds/Vect.h"
+#include "../types/RandomVariable.h"
 
 /**
  * The MAKE_POSE macro gets a baseclass and derivates a class, which 
@@ -44,12 +45,12 @@ struct name ## _T : public name ## _Base_T { \
 		return position; \
 	} \
 }; \
-typedef RVWrapper<name ## _T> name;
+typedef SLOM::RVWrapper<name ## _T> name;
 
 #define MAKE_POSE2D(name, posN, orientN, otherVars) \
-MAKE_POSE(name, Vect<2>, posN, SO2, orientN, otherVars)
+MAKE_POSE(name, SLOM::Vect<2>, posN, SLOM::SO2, orientN, otherVars)
 
 #define MAKE_POSE3D(name, posN, orientN, otherVars) \
-MAKE_POSE(name, Vect<3>, posN, SO3, orientN, otherVars)
+MAKE_POSE(name, SLOM::Vect<3>, posN, SLOM::SO3, orientN, otherVars)
 
 #endif /*MAKEPOSE_H_*/

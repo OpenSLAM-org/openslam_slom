@@ -16,7 +16,7 @@
  * BUILD_RANDOMVAR(name, entries)
  * makro to generate RandomVariables (derived from RandomVar, IRandomVar)
  * name is the class-name of the RV, entries is the list of entries like this:
- * BUILD_RANDOMVAR(Pose3D, (( Vect<3>, pos)) (( SO3, orientation)) ) 
+ * BUILD_RANDOMVAR(Pose3D, (( Vect<3>, pos)) (( SO3, orientation)) )
  * Whitespace is optional, but the double parentheses are necessary.
  * Construction is done entirely in preprocessor.
  */
@@ -40,17 +40,17 @@ struct name ## _T{ \
 		return res; \
 	} \
 }; \
-typedef RVWrapper<name ## _T> name;
+typedef SLOM::RVWrapper<name ## _T> name;
 
 
 /**
  * BUILD_MEASUREMENT(name, dim, variables, data)
  * makro to generate Measurements (derived from IMeasurement)
  * name is the class-name of the Measurement, dim is its dimension.
- * variables are the RVs the measurement depends on and data can be 
+ * variables are the RVs the measurement depends on and data can be
  * some arbitrary data variables.
- * Both variables and data must be given in a list like this: 
- * BUILD_MEASUREMENT(OdoMeas, 3, 
+ * Both variables and data must be given in a list like this:
+ * BUILD_MEASUREMENT(OdoMeas, 3,
  *    ((Pose, start)) ((Pose, end)),
  *    ((double, linear)) ((double, theta))
  * )
@@ -60,7 +60,7 @@ typedef RVWrapper<name ## _T> name;
  * has to be defined
  */
 #define BUILD_MEASUREMENT(name, dim, variables, data) \
-struct name : public IMeasurement { \
+struct name : public SLOM::IMeasurement { \
 	SEQ_FOR_EACH(MEASUREMENT_GENERATE_VARLIST, variables) \
 	SEQ_FOR_EACH(MEASUREMENT_GENERATE_DATALIST, data)     \
 	name( \
@@ -76,7 +76,7 @@ struct name : public IMeasurement { \
 	name& operator=(const name& f){ return *(new(this)name(f)); }\
 	int getDim() const { return dim; } \
 	double* eval(double *ret) const; \
-}; 
+};
 
 
 #define SEQ_TRANSFORM(op, seq) BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TRANSFORM_S(1, op, , seq))
@@ -120,10 +120,10 @@ struct name : public IMeasurement { \
 
 #define MEASUREMENT_CONSTRUCTOR_ARG(r, data, type_id) \
 	TYPEREF_ID_OF_TYPEID type_id
-	
+
 #define MEASUREMENT_CONSTRUCTOR_ARG_D(r, data, type_id) \
 	, TYPE_ID_OF_TYPEID type_id
-	
+
 #define MEASUREMENT_GENERATE_CONSTRUCTOR(r, data, type_id) \
 	ID_OF_TYPEID type_id(ID_OF_TYPEID type_id)
 
