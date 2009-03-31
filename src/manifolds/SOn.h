@@ -13,7 +13,7 @@ namespace SLOM {
 /**
  * Overloading operators for rotations.
  * Operators are overloaded as if rotations were represented as matrix.
- * A/B calculates A*B^-1, A%B calculates A^-1*B (like e.g. Matlabs '\')
+ * A/B calculates A*B^-1, A%B calculates A^-1*B (like e.g. Matlab's '\')
  */
 template<typename T, int N>
 struct RotationGroup {

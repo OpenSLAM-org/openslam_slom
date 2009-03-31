@@ -1,6 +1,8 @@
 #ifndef VECT_H_
 #define VECT_H_
 
+#include "../types/Manifold.h"
+
 namespace SLOM {
 
 
@@ -31,6 +33,13 @@ struct Vect : public Manifold<Vect<D>,D>{
 	double& operator[](int idx) {return data[idx]; }
 	const double& operator[](int idx) const {return data[idx]; }
 	
+};
+
+struct Scalar : public Vect<1> {
+	Scalar(double x) : Vect<1>(&x) {}
+	operator double() const{
+		return *data;
+	}
 };
 
 

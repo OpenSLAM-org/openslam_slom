@@ -154,8 +154,9 @@ public:
 		return cholCovariance;
 	}
 	
-	void changeAlgorithm(Algorithm algo){
+	void changeAlgorithm(Algorithm algo, double lamdaNew=-1){
 		usedAlgorithm = algo;
+		if(lamdaNew > 0) lamda = lamdaNew;
 		freeWorkspace();
 		initialize();
 	}

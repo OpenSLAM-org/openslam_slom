@@ -77,8 +77,10 @@ void Estimator::createSparse(){
 		int vDOF = var->getDOF();
 		assert(vDOF>0);
 		if(var->begin()==var->end()){
-			std::cerr << v - variables.begin() << std::endl;
-			assert(var->begin() != var->end()); // No measurements
+			std::cerr << "No measurement for Variable " 
+			          << v - variables.begin() << std::endl;
+			assert(usedAlgorithm != GaussNewton);
+			// assert(var->begin() != var->end()); // No measurements
 
 		}
 		for(IRVWrapper::const_iterator meas= var->begin(); meas!= var->end(); meas++){

@@ -1,13 +1,4 @@
-include ../../Makefile.conf
-
-LD = $(CXX)
-
-SRC = ../../src
-
-CPPFLAGS += -I$(SRC)
-
-
-HEADER = $(SRC)/Estimator.h $(SRC)/types/*.h $(SRC)/tools/*.h $(SRC)/manifolds/*.h
+include ../Make.include
 
 
 HEADER += dlr_parser.h dlr_types.h ../tools.h

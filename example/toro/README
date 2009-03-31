@@ -1,0 +1,33 @@
+The programs here are logfile compatible with the toro framework [1].
+They can either run on the raw data or on data preprocessed, i.e. after
+the node reduction but before the optimization or after the optimization.
+Node reduction is not done within this example program.
+
+Example logfiles for both 2D and 3D cases can be obtained via svn at:
+https://svn.openslam.org/data/svn/toro/data
+(You should download the whole project though, for comparision and to run
+SLoM with preprocessed data.)
+
+Usage:
+Compile using make in the trunk directory
+
+Change back to this directory and run
+$ ./relation2d $(TORO2D_LOGFILE)
+or
+$ ./relation3d $(TORO3D_LOGFILE)
+
+It outputs the coordinate and orientation (as quaternion) of each vertex
+after each iteration.
+
+Results:
+For the 2D-logfile, SLoM converges quite fast on the raw data and it gets a 
+smaller residuum than toro2d.
+For the 3D-logfiles SLoM doesn't converge to the optimal result (this is
+quite problematic for SLoM as here the start-values are far away from the
+optimal solution and the problem is highly non-linear.
+
+Further remarks and comparisions might come in near future ...
+
+
+[1]
+http://openslam.org/toro.html
