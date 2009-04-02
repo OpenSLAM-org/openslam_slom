@@ -4,6 +4,7 @@
 #include <deque>
 #include <boost/ptr_container/ptr_map.hpp>
 
+#include <boost/version.hpp>
 
 #include <types/Measurement.h>
 #include <tools/MakePose.h>
@@ -63,6 +64,14 @@ double* LM_observation_Calib::eval(double ret[2]) const
 typedef boost::ptr_map<int, LandMark> LM_storage;
 typedef std::deque<Pose> Poses;
 
+// different syntax for dereferencing iterators:
+#if BOOST_VERSION < 103400
+#  define PTR_MAP_IT_KEY(it) (it.key())
+#  define PTR_MAP_IT_VALUE(it) (*it)
+#else
+#  define PTR_MAP_IT_KEY(it) (it->first)
+#  define PTR_MAP_IT_VALUE(it) (*it->second)
+#endif
 
 
 #endif /* DLR_TYPES_H_ */

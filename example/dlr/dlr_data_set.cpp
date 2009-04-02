@@ -36,7 +36,9 @@ typedef LM_observation_Calib LM_obs;
 void outputLandmarks(const LM_storage &lms, int k){
 	std::ofstream out(make_filename("output",k,".lm").c_str());
 	for(LM_storage::const_iterator it=lms.begin(); it!=lms.end(); ++it){
-		out << (**it)[0] << " " << (**it)[1] << " " << it.key() << endl;
+		out << (*PTR_MAP_IT_VALUE(it))[0] << " " 
+		    << (*PTR_MAP_IT_VALUE(it))[1] << " " 
+		    << PTR_MAP_IT_KEY(it) << endl;
 	}
 	out.close();
 }
@@ -143,7 +145,7 @@ int main(int argc, char* argv[])
 	if(argc>=3){ // read Landmarks from file
 		parseLandmarks(landmarks, argv[2]);
 		for(LM_storage::iterator it = landmarks.begin(); it != landmarks.end(); it++){
-			e.insertRV(&(*it));
+			e.insertRV(& PTR_MAP_IT_VALUE(it));
 		}
 		poses.push_back(Pose(Pose_T(), true));
 	} else {
