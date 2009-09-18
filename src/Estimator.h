@@ -56,6 +56,10 @@ private:
 	/** the cholesky factor of the current covariance.
 	 */
 	double* cholCovariance;
+	
+	/** the last Residual Sum of Squares
+	 */
+	double lastRSS;
 
 	
 	/**
@@ -148,6 +152,10 @@ public:
 	
 	int getN() const {
 		return variables.getDim();
+	}
+	
+	double getLastRSS() const {
+		return lastRSS;
 	}
 	
 	const double * getCholCovariance() const {

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 #include <manifolds/Vect.h>
 
@@ -10,7 +11,7 @@
 template<int n>
 void matrixSubMulDiff(double res[n],
 		const SLOM::Vect<n*n> &matrix, const SLOM::Vect<n> &vec,
-		const SLOM::Vect<n> &off, double factor=1){
+		const SLOM::Vect<n> &off = SLOM::Vect<n>(), double factor=1){
 	const double *m=matrix.data;
 	for(int i=0; i<n; i++){
 		double x=factor*(vec[i] - off[i]);

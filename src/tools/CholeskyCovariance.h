@@ -29,14 +29,14 @@ template<int dim>
 struct CholeskyCovariance
 {
 	enum {DIM = dim, SIZE = (dim*(dim+1))/2};
-	// chol is an lower triangular matrix, saved in row major order
+	// chol is a lower triangular matrix, saved in row major order
 	double chol[SIZE];
 
 
 	CholeskyCovariance() {};
 
 	CholeskyCovariance(const double *A, CholeskyMode::CM mode){
-		double skip = false;
+		bool skip = false;
 		switch(mode){
 		case CholeskyMode::COPY_UPPER:
 			skip = true;
@@ -48,6 +48,8 @@ struct CholeskyCovariance
 		case CholeskyMode::CHOLESKY_FULL:
 			calculateCholesky(A, skip);
 			break;
+		default:
+			assert(false); //Unknown CholeskyMode
 		}
 	}
 	/**

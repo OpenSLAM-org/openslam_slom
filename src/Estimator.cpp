@@ -1,6 +1,7 @@
 #include "Estimator.h"
 
 #include <algorithm>
+#include <numeric>
 #include <cmath>
 #include <cassert>
 
@@ -14,10 +15,10 @@ namespace SLOM {
 
 
 void Estimator::freeWorkspace(){
-	jacobian=cs_spfree(jacobian);
-	JtJ = cs_spfree(JtJ);
-	symbolic=cs_sfree(symbolic);
-	numeric=cs_nfree(numeric);
+	jacobian = cs_spfree(jacobian);
+	JtJ      = cs_spfree(JtJ);
+	symbolic = cs_sfree(symbolic);
+	numeric  = cs_nfree(numeric);
 
 	delete[] res;            res = 0;
 	delete[] workspace;      workspace = 0;
@@ -114,6 +115,7 @@ void Estimator::createSparse(){
 		break;
 	}
 	res=new double[M];
+	lastRSS = -1;
 	workspace = new double[M];
 }
 
@@ -260,6 +262,11 @@ void Estimator::initialize(){
 	initCovariance();
 }
 
+static inline bool absCmp(double a, double b){
+	return std::abs(a) < std::abs(b);
+}
+
+
 double Estimator::optimizeStep(){
 	// TODO better parameter control for LMA
 	assert(jacobian);
@@ -270,14 +277,17 @@ double Estimator::optimizeStep(){
 
 
 	//std::fill(workspace, workspace+m, 0);
-	double sum=evaluate(res);
-	std::cout << sum;
+	if(lastRSS < 0){
+		lastRSS = evaluate(res);
+	}
+	std::cout << lastRSS;
 	if(usedAlgorithm != GaussNewton){
 		std::fill(res + m-n, res+m, 0);
 	}
 
 	double* delta = usedAlgorithm == GaussNewton ? res : res + m-n;
 
+	// Solve the linear system and store the result in delta:
 	switch(usedSolver){
 	case QR:
 		qrSolve(delta);
@@ -288,6 +298,13 @@ double Estimator::optimizeStep(){
 	}
 
 	const double *temp=delta;
+	//some information about the delta_vector:
+	double normInf=0, norm2=0;
+	norm2 = std::inner_product(temp, temp+n, temp, norm2);
+	normInf = std::abs(*std::max_element(temp, temp+n, absCmp));
+	std::cout << ", Update: rms: " << std::sqrt(norm2/n) << " normInf: " << normInf; 
+	
+	// Add delta-vector to the variables:
 	for(IdxVector<IRVWrapper>::iterator v = variables.begin(); v!= variables.end(); v++){
 		IRVWrapper* var = *v;
 		if(var->optimize){
@@ -295,22 +312,26 @@ double Estimator::optimizeStep(){
 		} else {
 			temp += var->getDOF();
 		}
-		//var->store();
 	}
-	double sum2 = evaluate(workspace);
-	double gain = (sum - sum2)/sum2;
-	std::cout << ", RSS: " << sum2 << ", RMS: " << std::sqrt(sum2/m) << ", Gain: " << gain;
+	// calculate the new RSS:
+	double newRSS = evaluate(workspace);
+	double gain = (lastRSS - newRSS)/newRSS;
+	std::cout << ", RSS: " << newRSS << ", RMS: " << std::sqrt(newRSS/m) << ", Gain: " << gain;
 	if(gain > 0 || usedAlgorithm == GaussNewton){
+		// positive gain or GaussNewton: 
+		// Store modified variables permanently, current RSS to res, and reduce lamda.
 		for(IdxVector<IRVWrapper>::iterator v = variables.begin(); v!= variables.end(); v++){
 			(*v)->store();
 		}
-		std::swap(workspace, res);
+		std::swap(workspace, res); lastRSS = newRSS;
 		lamda *= sqrt(0.1);
 	} else {
+		// Restore variables, increase lamda
 		for(IdxVector<IRVWrapper>::iterator v = variables.begin(); v!= variables.end(); v++){
 			(*v)->restore();
 		}
 		lamda *= sqrt(10.0);
+		lastRSS = -lastRSS; // old res got overwritten and has to be recalculated
 	}
 	if(usedAlgorithm != GaussNewton){
 		std::cout << ", lamda = " << lamda;

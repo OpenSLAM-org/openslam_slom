@@ -158,13 +158,18 @@ int main(int argc, char** argv){
 	
 	e.initialize();
 
-	int kMax = 30; //TODO read from commandline
+	int kMax = 50; //TODO read from commandline
 	for(int k=1; k<=kMax; k++){
-		
+		cout << "Step " << k << ": ";
 		double gain = e.optimizeStep();
 		
 		outputPoses(poses, k);
 		if( 0 <= gain && gain < 1e-9) break;
+		if(k==15){
+			cout << "\n Switching to Gauss-Newton\n";
+			e.changeAlgorithm(SLOM::Estimator::GaussNewton);
+			
+		}
 	}
 	gettimeofday(&te,0);
 	cout << "**** Optimization Done ****" << endl;

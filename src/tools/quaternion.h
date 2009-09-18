@@ -36,10 +36,10 @@ struct Quaternion{
 	 * Code based on: 
 	 * http://www.euclideanspace.com/maths/geometry/rotations/conversions/eulerToQuaternion/
 	 */
-	void rollPitchYaw(double r, double p, double y){
+	void rollPitchYaw(double r, double p, double j){
 		// TODO check order of rotations!!!
-		double c1=cos(r/2), c2=cos(p/2), c3=cos(p/3);
-		double s1=sin(r/2), s2=sin(p/2), s3=sin(p/3);
+		double c1=cos(r/2), c2=cos(p/2), c3=cos(j/2);
+		double s1=sin(r/2), s2=sin(p/2), s3=sin(j/2);
 		
 		w = c1 * c2 * c3 - s1 * s2 * s3;
 		x = s1 * s2 * c3 + c1 * c2 * s3;

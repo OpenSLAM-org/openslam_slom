@@ -94,6 +94,11 @@ struct SO3 : public Manifold<SO3, 3>, public RotationGroup<SO3, 3>{
 	void rotate(Vect<3> &res, const Vect<3> &vec, bool back=false) const {
 		quat.rotate(res.data, vec.data, back);
 	}
+
+	void rotate(double res[3], const double vec[3], bool back=false) const {
+		quat.rotate(res, vec, back);
+	}
+
 };
 
 

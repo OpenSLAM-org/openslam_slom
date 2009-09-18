@@ -126,7 +126,7 @@ int main(int argc, char** argv){
 	
 	int kMax = 50; //TODO read from commandline
 	for(int k=1; k<=kMax; k++){
-		
+		cout << "Step " << k << ": ";
 		double gain = e.optimizeStep();
 		
 		//outputPoses(poses, k);
