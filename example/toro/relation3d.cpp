@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/version.hpp>
 #include <sys/time.h>
 
 #include "../tools.h"
@@ -66,6 +67,16 @@ void readPose(Pose_T & pose, istream & inp){
 
 typedef boost::ptr_map<int, Pose> Poses;
 
+#if BOOST_VERSION < 103400
+#  define PTR_MAP_IT_KEY(it) (it.key())
+#  define PTR_MAP_IT_VALUE(it) (*it)
+#else
+#  define PTR_MAP_IT_KEY(it) (it->first)
+#  define PTR_MAP_IT_VALUE(it) (*it->second)
+#endif
+
+
+
 /// Measurement model:
 
 BUILD_MEASUREMENT(Odo, 6, ((Pose, t0)) ((Pose, t1)), 
@@ -83,8 +94,8 @@ double* Odo::eval(double ret[6]) const
 void outputPoses(const Poses &poses, int k){
 	std::ofstream out(make_filename("output",k,".pos").c_str());
 	for (Poses::const_iterator it = poses.begin(); it != poses.end(); ++it) {
-		out << (*it)->pos[0] << " " << (*it)->pos[1] << " " << (*it)->pos[2] << " ";
-		const Quaternion &q = (*it)->orientation.quat;
+		out << PTR_MAP_IT_VALUE(it)->pos[0] << " " << PTR_MAP_IT_VALUE(it)->pos[1] << " " << PTR_MAP_IT_VALUE(it)->pos[2] << " ";
+		const Quaternion &q = PTR_MAP_IT_VALUE(it)->orientation.quat;
 		out << q.w << " " << q.x << " " << q.y << " " << q.z << endl;
 	}
 	out.close();

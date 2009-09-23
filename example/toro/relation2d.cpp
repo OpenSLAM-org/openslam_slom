@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <boost/ptr_container/ptr_map.hpp>
+#include <boost/version.hpp>
 #include <sys/time.h>
 
 #include "../tools.h"
@@ -27,6 +28,15 @@ MAKE_POSE2D(Pose, pos , orientation, )
 
 typedef boost::ptr_map<int, Pose> Poses;
 
+#if BOOST_VERSION < 103400
+#  define PTR_MAP_IT_KEY(it) (it.key())
+#  define PTR_MAP_IT_VALUE(it) (*it)
+#else
+#  define PTR_MAP_IT_KEY(it) (it->first)
+#  define PTR_MAP_IT_VALUE(it) (*it->second)
+#endif
+
+
 /// Measurement model:
 
 BUILD_MEASUREMENT(Odo, 3, ((Pose, t0)) ((Pose, t1)), 
@@ -44,8 +54,8 @@ double* Odo::eval(double ret[3]) const
 void outputPoses(const Poses &poses, int k){
 	std::ofstream out(make_filename("output",k,".pos").c_str());
 	for (Poses::const_iterator it = poses.begin(); it != poses.end(); ++it) {
-		out << (*it)->pos[0] << " " << (*it)->pos[1] << " " 
-		    << (*it)->orientation << endl;
+		out << PTR_MAP_IT_VALUE(it)->pos[0] << " " << PTR_MAP_IT_VALUE(it)->pos[1] << " "
+		    << PTR_MAP_IT_VALUE(it)->orientation << endl;
 	}
 	out.close();
 }
