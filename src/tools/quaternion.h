@@ -109,7 +109,11 @@ struct Quaternion{
 	void toScaledAxis(double* res){
 		double nv = sqrt(x*x + y*y + z*z);
 		if( nv < 1e-12) nv = 1e-12;
-		double s = 2*atan2(nv,w)/nv; // = 2*atan2(nv, w)/nv;
+		// BUGFIX 2009-11-30: q and -q are represent the same rotation 
+		//                    and must lead to the same result!
+		// Note that singularity for w==0 is not dramatic, as 
+		// atan(+/-inf) = +/- pi/2 (in this case both solutions are acceptable)
+		double s = 2*atan(nv/w)/nv; // != 2*atan2(nv, w)/nv;
 		*res++ = x*s; *res++ = y*s; *res++ = z*s;
 	}
 	

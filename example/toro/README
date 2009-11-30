@@ -22,11 +22,14 @@ after each iteration.
 Results:
 For the 2D-logfile, SLoM converges quite fast on the raw data and it gets a 
 smaller residuum than toro2d.
-For the 3D-logfiles SLoM doesn't converge to the optimal result (this is
-quite problematic for SLoM as here the start-values are far away from the
-optimal solution and the problem is highly non-linear.
 
-Further remarks and comparisions might come in near future ...
+UPDATE (2009-11-30):
+After a bugfix in the quaternion encapsulation the 3D case now converges at 
+least locally. After a single step of toro-optimization it needs about five 
+Gauss-Newton steps.
+Global convergence is still problematic as the start-values are far away from 
+the optimal solution and the problem is highly non-linear.
+
 
 
 [1]

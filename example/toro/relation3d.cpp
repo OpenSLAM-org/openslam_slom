@@ -109,7 +109,7 @@ int main(int argc, char** argv){
 	ifstream logfile(argv[1]);
 	
 	
-	Estimator e(Estimator::Cholesky, Estimator::Levenberg, 10);
+	Estimator e(Estimator::Cholesky, Estimator::GaussNewton, 10);
 	Poses poses;
 	deque<Odo> odo;
 		
@@ -176,11 +176,11 @@ int main(int argc, char** argv){
 		
 		outputPoses(poses, k);
 		if( 0 <= gain && gain < 1e-9) break;
-		if(k==15){
-			cout << "\n Switching to Gauss-Newton\n";
-			e.changeAlgorithm(SLOM::Estimator::GaussNewton);
-			
-		}
+//		if(k==15){
+//			cout << "\n Switching to Gauss-Newton\n";
+//			e.changeAlgorithm(SLOM::Estimator::GaussNewton);
+//			
+//		}
 	}
 	gettimeofday(&te,0);
 	cout << "**** Optimization Done ****" << endl;
